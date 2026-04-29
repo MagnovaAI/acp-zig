@@ -1,0 +1,15 @@
+.{
+    .name = .acp,
+    .version = "0.0.0",
+    .fingerprint = 0xa881315d23dae66c,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "README.md",
+    },
+}

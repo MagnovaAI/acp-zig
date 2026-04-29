@@ -1,0 +1,33 @@
+# Zig build artifacts
+.zig-cache/
+zig-cache/
+zig-out/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Env / secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
+
+# Scratch
+.scratch/
+tmp/
+
+AGENTS.md
+CLAUDE.md
