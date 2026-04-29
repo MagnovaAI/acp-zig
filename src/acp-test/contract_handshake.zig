@@ -167,3 +167,43 @@ test "client and agent complete handshake -> prompt -> cancel loop" {
     try std.testing.expect(agent_ctx.seen_prompt);
     try std.testing.expect(agent_ctx.seen_cancel);
 }
+
+test "Connection records frames into an attached trace buffer" {
+    const a = std.testing.allocator;
+    const pair = try PipePair.init(a);
+    defer pair.deinit();
+
+    var agent_ctx: Agent = .{};
+    var agent_conn = acp.Connection.init(a, pair.transportB());
+    agent_conn.setNotificationHandler(.{ .ptr = &agent_ctx, .vtable = &agent_notification_vtable });
+
+    var client_conn = acp.Connection.init(a, pair.transportA());
+
+    var client_trace = try acp.TraceBuffer.init(a, 16);
+    defer client_trace.deinit();
+    var agent_trace = try acp.TraceBuffer.init(a, 16);
+    defer agent_trace.deinit();
+
+    client_conn.setTraceBuffer(&client_trace);
+    agent_conn.setTraceBuffer(&agent_trace);
+
+    // notify() routes through the traced write helper; pumpOne() routes
+    // through the traced read helper. One frame visible on each side.
+    const params = .{ .sessionId = schema.agent.SessionId{ .value = "s1" } };
+    try client_conn.notify(schema.agent.method_session_cancel, params);
+    try agent_conn.pumpOne();
+
+    var client_it = client_trace.iterator();
+    const c1 = client_it.next().?;
+    try std.testing.expectEqual(acp.TraceDirection.outbound, c1.direction);
+    try std.testing.expect(std.mem.indexOf(u8, c1.bytes, "session/cancel") != null);
+    try std.testing.expect(client_it.next() == null);
+
+    var agent_it = agent_trace.iterator();
+    const a1 = agent_it.next().?;
+    try std.testing.expectEqual(acp.TraceDirection.inbound, a1.direction);
+    try std.testing.expect(std.mem.indexOf(u8, a1.bytes, "session/cancel") != null);
+    try std.testing.expect(agent_it.next() == null);
+
+    try std.testing.expect(agent_ctx.seen_cancel);
+}

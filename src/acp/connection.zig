@@ -13,6 +13,7 @@ const Transport = @import("transport.zig").Transport;
 const Frame = @import("transport.zig").Frame;
 const RequestHandler = @import("handler.zig").RequestHandler;
 const NotificationHandler = @import("handler.zig").NotificationHandler;
+const TraceBuffer = @import("trace.zig").Buffer;
 
 const log = std.log.scoped(.acp_connection);
 
@@ -21,6 +22,7 @@ pub const Connection = struct {
     transport: Transport,
     request_handler: ?RequestHandler = null,
     notification_handler: ?NotificationHandler = null,
+    trace: ?*TraceBuffer = null,
     next_id: i64 = 1,
 
     /// Borrow `transport`. The Connection does not take ownership; the
@@ -44,6 +46,28 @@ pub const Connection = struct {
         self.notification_handler = h;
     }
 
+    /// Attach a trace buffer. Every frame the connection writes or reads
+    /// is recorded into the buffer with its direction. Diagnostics-only;
+    /// trace failures do not propagate.
+    pub fn setTraceBuffer(self: *Connection, buffer: *TraceBuffer) void {
+        self.trace = buffer;
+    }
+
+    fn writeTraced(self: *Connection, bytes: []const u8) AcpError!void {
+        if (self.trace) |t| t.push(.outbound, bytes) catch |err| {
+            log.warn("trace push (outbound) failed: {s}", .{@errorName(err)});
+        };
+        try self.transport.writeFrame(.{ .bytes = bytes });
+    }
+
+    fn readTraced(self: *Connection) AcpError![]u8 {
+        const bytes = try self.transport.readFrame(self.allocator);
+        if (self.trace) |t| t.push(.inbound, bytes) catch |err| {
+            log.warn("trace push (inbound) failed: {s}", .{@errorName(err)});
+        };
+        return bytes;
+    }
+
     /// Send a notification (no response expected).
     pub fn notify(
         self: *Connection,
@@ -60,7 +84,7 @@ pub const Connection = struct {
         std.json.Stringify.value(params, .{}, w) catch return error.OutOfMemory;
         w.writeAll("}") catch return error.OutOfMemory;
 
-        try self.transport.writeFrame(.{ .bytes = buf.written() });
+        try self.writeTraced(buf.written());
     }
 
     /// Send a request, then pump frames until the matching response arrives.
@@ -83,12 +107,12 @@ pub const Connection = struct {
             w.writeAll(",\"params\":") catch return error.OutOfMemory;
             std.json.Stringify.value(params, .{}, w) catch return error.OutOfMemory;
             w.writeAll("}") catch return error.OutOfMemory;
-            try self.transport.writeFrame(.{ .bytes = buf.written() });
+            try self.writeTraced(buf.written());
         }
 
         // Pump frames until we see id == our id.
         while (true) {
-            const frame_bytes = try self.transport.readFrame(self.allocator);
+            const frame_bytes = try self.readTraced();
             defer self.allocator.free(frame_bytes);
 
             const parsed = std.json.parseFromSlice(std.json.Value, self.allocator, frame_bytes, .{}) catch {
@@ -135,7 +159,7 @@ pub const Connection = struct {
 
     /// Read one frame and dispatch it. Returns `error.TransportClosed` on EOF.
     pub fn pumpOne(self: *Connection) AcpError!void {
-        const frame_bytes = try self.transport.readFrame(self.allocator);
+        const frame_bytes = try self.readTraced();
         defer self.allocator.free(frame_bytes);
 
         const parsed = std.json.parseFromSlice(std.json.Value, self.allocator, frame_bytes, .{}) catch {
@@ -224,7 +248,7 @@ pub const Connection = struct {
         w.writeAll(",\"result\":") catch return error.OutOfMemory;
         std.json.Stringify.value(result, .{}, w) catch return error.OutOfMemory;
         w.writeAll("}") catch return error.OutOfMemory;
-        try self.transport.writeFrame(.{ .bytes = buf.written() });
+        try self.writeTraced(buf.written());
     }
 
     fn writeError(self: *Connection, id_v: std.json.Value, code: i32, message: []const u8) AcpError!void {
@@ -236,7 +260,7 @@ pub const Connection = struct {
         w.print(",\"error\":{{\"code\":{d},\"message\":", .{code}) catch return error.OutOfMemory;
         std.json.Stringify.value(message, .{}, w) catch return error.OutOfMemory;
         w.writeAll("}}") catch return error.OutOfMemory;
-        try self.transport.writeFrame(.{ .bytes = buf.written() });
+        try self.writeTraced(buf.written());
     }
 };
 
