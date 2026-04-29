@@ -51,6 +51,27 @@ pub fn build(b: *std.Build) void {
         .root_module = acp_test,
     });
     test_step.dependOn(&b.addRunArtifact(acp_test_tests).step);
+
+    // Schema catalog generator: emits a canonical, sorted JSON description
+    // of every public wire type and method-name constant. Drives external
+    // drift checks against the published protocol surface.
+    const gen_schema_module = b.createModule(.{
+        .root_source_file = b.path("tools/gen_schema/main.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    gen_schema_module.addImport("acp-schema", schema);
+
+    const gen_schema_exe = b.addExecutable(.{
+        .name = "gen-schema",
+        .root_module = gen_schema_module,
+    });
+    b.installArtifact(gen_schema_exe);
+
+    const gen_schema_run = b.addRunArtifact(gen_schema_exe);
+    if (b.args) |args| gen_schema_run.addArgs(args);
+    const gen_schema_step = b.step("gen-schema", "Emit canonical schema catalog JSON (path arg or stdout)");
+    gen_schema_step.dependOn(&gen_schema_run.step);
 }
 
 const UnstableFlags = struct {
