@@ -17,6 +17,9 @@ pub const handler = @import("handler.zig");
 pub const RequestHandler = handler.RequestHandler;
 pub const NotificationHandler = handler.NotificationHandler;
 
+pub const typed = @import("typed.zig");
+pub const Dispatcher = typed.Dispatcher;
+
 pub const transport = @import("transport.zig");
 pub const Transport = transport.Transport;
 pub const Frame = transport.Frame;
