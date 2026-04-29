@@ -46,6 +46,11 @@ pub fn build(b: *std.Build) void {
     });
     acp_conductor.addImport("acp", acp);
 
+    const vaxis_dep = b.lazyDependency("vaxis", .{
+        .target = target,
+        .optimize = optimize,
+    });
+
     const test_step = b.step("test", "Run unit tests");
 
     const schema_tests = b.addTest(.{
@@ -127,6 +132,26 @@ pub fn build(b: *std.Build) void {
     if (b.args) |args| gen_schema_run.addArgs(args);
     const gen_schema_step = b.step("gen-schema", "Emit canonical schema catalog JSON (path arg or stdout)");
     gen_schema_step.dependOn(&gen_schema_run.step);
+
+    if (vaxis_dep) |dep| {
+        const vaxis_module = dep.module("vaxis");
+
+        const trace_viewer_module = b.createModule(.{
+            .root_source_file = b.path("src/acp-trace-viewer/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        });
+        trace_viewer_module.addImport("vaxis", vaxis_module);
+
+        const trace_viewer_exe = b.addExecutable(.{
+            .name = "acp-trace-viewer",
+            .root_module = trace_viewer_module,
+        });
+        b.installArtifact(trace_viewer_exe);
+
+        const viewer_step = b.step("trace-viewer", "Build the interactive trace viewer");
+        viewer_step.dependOn(&trace_viewer_exe.step);
+    }
 }
 
 const UnstableFlags = struct {
