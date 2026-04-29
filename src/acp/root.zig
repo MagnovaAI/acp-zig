@@ -25,6 +25,11 @@ pub const Session = session.Session;
 pub const SessionRegistry = session.Registry;
 pub const SessionState = session.State;
 
+pub const trace = @import("trace.zig");
+pub const TraceBuffer = trace.Buffer;
+pub const TraceEntry = trace.Entry;
+pub const TraceDirection = trace.Direction;
+
 pub const transport = @import("transport.zig");
 pub const Transport = transport.Transport;
 pub const Frame = transport.Frame;
