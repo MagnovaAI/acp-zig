@@ -20,6 +20,11 @@ pub const NotificationHandler = handler.NotificationHandler;
 pub const typed = @import("typed.zig");
 pub const Dispatcher = typed.Dispatcher;
 
+pub const session = @import("session.zig");
+pub const Session = session.Session;
+pub const SessionRegistry = session.Registry;
+pub const SessionState = session.State;
+
 pub const transport = @import("transport.zig");
 pub const Transport = transport.Transport;
 pub const Frame = transport.Frame;
