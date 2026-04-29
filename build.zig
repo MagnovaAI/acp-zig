@@ -32,6 +32,13 @@ pub fn build(b: *std.Build) void {
     acp_test.addImport("acp", acp);
     acp_test.addImport("acp-schema", schema);
 
+    const acp_async = b.addModule("acp-async", .{
+        .root_source_file = b.path("src/acp-async/root.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    acp_async.addImport("acp", acp);
+
     const test_step = b.step("test", "Run unit tests");
 
     const schema_tests = b.addTest(.{
@@ -51,6 +58,12 @@ pub fn build(b: *std.Build) void {
         .root_module = acp_test,
     });
     test_step.dependOn(&b.addRunArtifact(acp_test_tests).step);
+
+    const acp_async_tests = b.addTest(.{
+        .name = "acp-async-tests",
+        .root_module = acp_async,
+    });
+    test_step.dependOn(&b.addRunArtifact(acp_async_tests).step);
 }
 
 const UnstableFlags = struct {
