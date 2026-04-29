@@ -43,6 +43,15 @@ pub const ExtRequest = ext.ExtRequest;
 pub const ExtResponse = ext.ExtResponse;
 pub const ExtNotification = ext.ExtNotification;
 
+pub const tool_call = @import("tool_call.zig");
+pub const ToolCall = tool_call.ToolCall;
+pub const ToolCallId = tool_call.ToolCallId;
+pub const ToolCallStatus = tool_call.ToolCallStatus;
+pub const ToolKind = tool_call.ToolKind;
+pub const ToolCallContent = tool_call.ToolCallContent;
+pub const ToolCallLocation = tool_call.ToolCallLocation;
+pub const ToolCallUpdate = tool_call.ToolCallUpdate;
+
 pub const protocol_level = @import("protocol_level.zig");
 
 test {
