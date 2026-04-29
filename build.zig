@@ -96,6 +96,24 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(minimal_agent_exe);
     cookbook_step.dependOn(&minimal_agent_exe.step);
+
+    const gen_schema_module = b.createModule(.{
+        .root_source_file = b.path("tools/gen_schema/main.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    gen_schema_module.addImport("acp-schema", schema);
+
+    const gen_schema_exe = b.addExecutable(.{
+        .name = "gen-schema",
+        .root_module = gen_schema_module,
+    });
+    b.installArtifact(gen_schema_exe);
+
+    const gen_schema_run = b.addRunArtifact(gen_schema_exe);
+    if (b.args) |args| gen_schema_run.addArgs(args);
+    const gen_schema_step = b.step("gen-schema", "Emit canonical schema catalog JSON (path arg or stdout)");
+    gen_schema_step.dependOn(&gen_schema_run.step);
 }
 
 const UnstableFlags = struct {
