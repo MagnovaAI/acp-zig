@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: build, test, fmt
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Zig 0.16.0
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+
+      - name: zig version
+        run: zig version
+
+      - name: zig fmt --check
+        run: zig fmt --check src/ tools/
+
+      - name: zig build
+        run: zig build
+
+      - name: zig build test
+        run: zig build test --summary all
+
+      - name: zig build test (all unstable on)
+        run: |
+          zig build test \
+            -Dunstable_logout=true \
+            -Dunstable_session_fork=true \
+            -Dunstable_session_resume=true \
+            -Dunstable_session_close=true \
+            -Dunstable_session_model=true \
+            -Dunstable_elicitation=true \
+            -Dunstable_nes=true \
+            -Dunstable_cancel_request=true \
+            --summary all
