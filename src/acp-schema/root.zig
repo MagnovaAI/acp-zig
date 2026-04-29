@@ -66,6 +66,7 @@ pub const ClientNotification = routing.ClientNotification;
 pub const protocol_level = @import("protocol_level.zig");
 pub const elicitation = @import("elicitation.zig");
 pub const nes = @import("nes.zig");
+pub const unstable_session = @import("unstable_session.zig");
 
 test {
     std.testing.refAllDecls(@This());

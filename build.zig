@@ -180,6 +180,8 @@ const UnstableFlags = struct {
     unstable_auth_methods: bool,
     unstable_logout: bool,
     unstable_session_fork: bool,
+    unstable_session_resume: bool,
+    unstable_session_close: bool,
     unstable_session_model: bool,
     unstable_session_usage: bool,
     unstable_session_additional_directories: bool,
