@@ -10,11 +10,20 @@ pub fn build(b: *std.Build) void {
         build_options.addOption(bool, field.name, @field(flags, field.name));
     }
 
-    _ = target;
-    _ = optimize;
+    const schema = b.addModule("acp-schema", .{
+        .root_source_file = b.path("src/acp-schema/root.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    schema.addOptions("build_options", build_options);
 
     const test_step = b.step("test", "Run unit tests");
-    _ = test_step;
+
+    const schema_tests = b.addTest(.{
+        .name = "acp-schema-tests",
+        .root_module = schema,
+    });
+    test_step.dependOn(&b.addRunArtifact(schema_tests).step);
 }
 
 const UnstableFlags = struct {
