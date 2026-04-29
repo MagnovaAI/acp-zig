@@ -20,8 +20,10 @@ pub const AgentRequest = union(enum) {
     authenticate: agent.AuthenticateRequest,
     new_session: agent.NewSessionRequest,
     load_session: agent.LoadSessionRequest,
+    list_sessions: agent.ListSessionsRequest,
     prompt: agent.PromptRequest,
     set_mode: agent.SetModeRequest,
+    set_config_option: agent.SetConfigOptionRequest,
 
     pub fn methodName(self: AgentRequest) []const u8 {
         return switch (self) {
@@ -29,8 +31,10 @@ pub const AgentRequest = union(enum) {
             .authenticate => agent.method_authenticate,
             .new_session => agent.method_session_new,
             .load_session => agent.method_session_load,
+            .list_sessions => agent.method_session_list,
             .prompt => agent.method_session_prompt,
             .set_mode => agent.method_session_set_mode,
+            .set_config_option => agent.method_session_set_config_option,
         };
     }
 
@@ -48,10 +52,14 @@ pub const AgentRequest = union(enum) {
             return .{ .new_session = try std.json.parseFromValueLeaky(agent.NewSessionRequest, allocator, params, options) };
         if (std.mem.eql(u8, method, agent.method_session_load))
             return .{ .load_session = try std.json.parseFromValueLeaky(agent.LoadSessionRequest, allocator, params, options) };
+        if (std.mem.eql(u8, method, agent.method_session_list))
+            return .{ .list_sessions = try std.json.parseFromValueLeaky(agent.ListSessionsRequest, allocator, params, options) };
         if (std.mem.eql(u8, method, agent.method_session_prompt))
             return .{ .prompt = try std.json.parseFromValueLeaky(agent.PromptRequest, allocator, params, options) };
         if (std.mem.eql(u8, method, agent.method_session_set_mode))
             return .{ .set_mode = try std.json.parseFromValueLeaky(agent.SetModeRequest, allocator, params, options) };
+        if (std.mem.eql(u8, method, agent.method_session_set_config_option))
+            return .{ .set_config_option = try std.json.parseFromValueLeaky(agent.SetConfigOptionRequest, allocator, params, options) };
         return error.MethodNotFound;
     }
 };
@@ -62,8 +70,10 @@ pub const AgentResponse = union(enum) {
     authenticate: agent.AuthenticateResponse,
     new_session: agent.NewSessionResponse,
     load_session: agent.LoadSessionResponse,
+    list_sessions: agent.ListSessionsResponse,
     prompt: agent.PromptResponse,
     set_mode: agent.SetModeResponse,
+    set_config_option: agent.SetConfigOptionResponse,
 
     pub fn parseFromMethod(
         allocator: std.mem.Allocator,
@@ -79,10 +89,14 @@ pub const AgentResponse = union(enum) {
             return .{ .new_session = try std.json.parseFromValueLeaky(agent.NewSessionResponse, allocator, result, options) };
         if (std.mem.eql(u8, method, agent.method_session_load))
             return .{ .load_session = try std.json.parseFromValueLeaky(agent.LoadSessionResponse, allocator, result, options) };
+        if (std.mem.eql(u8, method, agent.method_session_list))
+            return .{ .list_sessions = try std.json.parseFromValueLeaky(agent.ListSessionsResponse, allocator, result, options) };
         if (std.mem.eql(u8, method, agent.method_session_prompt))
             return .{ .prompt = try std.json.parseFromValueLeaky(agent.PromptResponse, allocator, result, options) };
         if (std.mem.eql(u8, method, agent.method_session_set_mode))
             return .{ .set_mode = try std.json.parseFromValueLeaky(agent.SetModeResponse, allocator, result, options) };
+        if (std.mem.eql(u8, method, agent.method_session_set_config_option))
+            return .{ .set_config_option = try std.json.parseFromValueLeaky(agent.SetConfigOptionResponse, allocator, result, options) };
         return error.MethodNotFound;
     }
 };

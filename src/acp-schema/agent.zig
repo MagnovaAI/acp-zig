@@ -158,6 +158,7 @@ pub const PromptResponse = struct {
 pub const StopReason = enum {
     end_turn,
     max_tokens,
+    max_turn_requests,
     refusal,
     cancelled,
 
@@ -195,7 +196,7 @@ pub const CancelNotification = struct {
     sessionId: SessionId,
 };
 
-pub const method_session_set_mode: []const u8 = "session/set-mode";
+pub const method_session_set_mode: []const u8 = "session/set_mode";
 
 pub const SetModeRequest = struct {
     sessionId: SessionId,
@@ -203,6 +204,29 @@ pub const SetModeRequest = struct {
 };
 
 pub const SetModeResponse = struct {};
+
+pub const method_session_list: []const u8 = "session/list";
+
+pub const ListSessionsRequest = struct {};
+
+pub const SessionInfo = struct {
+    sessionId: SessionId,
+    cwd: []const u8,
+};
+
+pub const ListSessionsResponse = struct {
+    sessions: []const SessionInfo,
+};
+
+pub const method_session_set_config_option: []const u8 = "session/set_config_option";
+
+pub const SetConfigOptionRequest = struct {
+    sessionId: SessionId,
+    name: []const u8,
+    value: @import("serde_util.zig").RawValue,
+};
+
+pub const SetConfigOptionResponse = struct {};
 
 // session/update is a notification streamed from agent → client during a
 // prompt. Each update has a `sessionId` plus a tagged `update` payload
@@ -439,7 +463,7 @@ test "PromptRequest with text content" {
 }
 
 test "PromptResponse stop reasons" {
-    inline for (.{ "end_turn", "max_tokens", "refusal", "cancelled" }) |name| {
+    inline for (.{ "end_turn", "max_tokens", "max_turn_requests", "refusal", "cancelled" }) |name| {
         const src = "{\"stopReason\":\"" ++ name ++ "\"}";
         const parsed = try std.json.parseFromSlice(PromptResponse, std.testing.allocator, src, .{});
         defer parsed.deinit();

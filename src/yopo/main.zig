@@ -204,7 +204,7 @@ fn driveContract(client: *acp.Connection, agent: *acp.Connection) !void {
         if (resp.value.stopReason != .end_turn) return error.UnexpectedStopReason;
     }
 
-    // session/set-mode
+    // session/set_mode
     {
         const params = .{
             .sessionId = schema.agent.SessionId{ .value = session_id_str },
