@@ -17,6 +17,21 @@ pub fn build(b: *std.Build) void {
     });
     schema.addOptions("build_options", build_options);
 
+    const acp = b.addModule("acp", .{
+        .root_source_file = b.path("src/acp/root.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    acp.addImport("acp-schema", schema);
+
+    const acp_test = b.addModule("acp-test", .{
+        .root_source_file = b.path("src/acp-test/root.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    acp_test.addImport("acp", acp);
+    acp_test.addImport("acp-schema", schema);
+
     const test_step = b.step("test", "Run unit tests");
 
     const schema_tests = b.addTest(.{
@@ -24,6 +39,18 @@ pub fn build(b: *std.Build) void {
         .root_module = schema,
     });
     test_step.dependOn(&b.addRunArtifact(schema_tests).step);
+
+    const acp_tests = b.addTest(.{
+        .name = "acp-tests",
+        .root_module = acp,
+    });
+    test_step.dependOn(&b.addRunArtifact(acp_tests).step);
+
+    const acp_test_tests = b.addTest(.{
+        .name = "acp-test-tests",
+        .root_module = acp_test,
+    });
+    test_step.dependOn(&b.addRunArtifact(acp_test_tests).step);
 }
 
 const UnstableFlags = struct {
