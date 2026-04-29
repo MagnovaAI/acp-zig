@@ -39,6 +39,13 @@ pub fn build(b: *std.Build) void {
     });
     acp_async.addImport("acp", acp);
 
+    const acp_conductor = b.addModule("acp-conductor", .{
+        .root_source_file = b.path("src/acp-conductor/root.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    acp_conductor.addImport("acp", acp);
+
     const test_step = b.step("test", "Run unit tests");
 
     const schema_tests = b.addTest(.{
@@ -64,6 +71,12 @@ pub fn build(b: *std.Build) void {
         .root_module = acp_async,
     });
     test_step.dependOn(&b.addRunArtifact(acp_async_tests).step);
+
+    const acp_conductor_tests = b.addTest(.{
+        .name = "acp-conductor-tests",
+        .root_module = acp_conductor,
+    });
+    test_step.dependOn(&b.addRunArtifact(acp_conductor_tests).step);
 
     const cookbook_step = b.step("cookbook", "Build cookbook examples");
 
