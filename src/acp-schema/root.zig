@@ -53,6 +53,7 @@ pub const ToolCallLocation = tool_call.ToolCallLocation;
 pub const ToolCallUpdate = tool_call.ToolCallUpdate;
 
 pub const agent = @import("agent.zig");
+pub const client = @import("client.zig");
 
 pub const protocol_level = @import("protocol_level.zig");
 pub const elicitation = @import("elicitation.zig");
