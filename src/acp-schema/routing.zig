@@ -14,6 +14,7 @@ const client = @import("client.zig");
 // Client → Agent
 // ---------------------------------------------------------------------------
 
+/// Every request a client may send to an agent, keyed by JSON-RPC method.
 pub const AgentRequest = union(enum) {
     initialize: agent.InitializeRequest,
     authenticate: agent.AuthenticateRequest,
@@ -55,6 +56,7 @@ pub const AgentRequest = union(enum) {
     }
 };
 
+/// Response shape for each `AgentRequest` variant.
 pub const AgentResponse = union(enum) {
     initialize: agent.InitializeResponse,
     authenticate: agent.AuthenticateResponse,
@@ -85,6 +87,7 @@ pub const AgentResponse = union(enum) {
     }
 };
 
+/// Every notification a client may send to an agent.
 pub const AgentNotification = union(enum) {
     cancel: agent.CancelNotification,
 
@@ -110,6 +113,7 @@ pub const AgentNotification = union(enum) {
 // Agent → Client
 // ---------------------------------------------------------------------------
 
+/// Every request an agent may send to a client.
 pub const ClientRequest = union(enum) {
     request_permission: client.RequestPermissionRequest,
     read_text_file: client.ReadTextFileRequest,
@@ -159,6 +163,7 @@ pub const ClientRequest = union(enum) {
     }
 };
 
+/// Response shape for each `ClientRequest` variant.
 pub const ClientResponse = union(enum) {
     request_permission: client.RequestPermissionResponse,
     read_text_file: client.ReadTextFileResponse,
@@ -195,6 +200,7 @@ pub const ClientResponse = union(enum) {
     }
 };
 
+/// Every notification an agent may send to a client.
 pub const ClientNotification = union(enum) {
     session_update: agent.SessionNotification,
 

@@ -8,10 +8,15 @@
 const std = @import("std");
 const AcpError = @import("errors.zig").AcpError;
 
+/// One JSON-RPC message worth of bytes. The transport owns delimiting; this
+/// slice never includes framing overhead.
 pub const Frame = struct {
     bytes: []const u8,
 };
 
+/// Synchronous bidirectional byte channel for JSON-RPC frames. Concrete
+/// implementations live alongside their I/O strategy (in-memory pipe,
+/// stdio, etc.).
 pub const Transport = struct {
     ptr: *anyopaque,
     vtable: *const VTable,

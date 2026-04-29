@@ -10,11 +10,14 @@
 const std = @import("std");
 const RawValue = @import("serde_util.zig").RawValue;
 
+/// Optional metadata attached to any content block — hints for the receiver,
+/// never load-bearing for protocol semantics.
 pub const Annotations = struct {
     audience: ?[]const Role = null,
     priority: ?f64 = null,
 };
 
+/// Logical author of a content block.
 pub const Role = enum {
     user,
     assistant,
@@ -24,6 +27,7 @@ pub const Role = enum {
     }
 };
 
+/// Plain UTF-8 text. Most common content block.
 pub const TextContent = struct {
     text: []const u8,
     annotations: ?Annotations = null,
@@ -45,11 +49,14 @@ pub const AudioContent = struct {
     annotations: ?Annotations = null,
 };
 
+/// Inline resource payload (text or blob) carried directly in the message.
 pub const EmbeddedResource = struct {
     resource: ResourceContents,
     annotations: ?Annotations = null,
 };
 
+/// Reference to a resource by URI. The peer fetches separately if it wants
+/// the body.
 pub const ResourceLink = struct {
     uri: []const u8,
     name: []const u8,
@@ -60,6 +67,8 @@ pub const ResourceLink = struct {
     annotations: ?Annotations = null,
 };
 
+/// Body of an embedded resource. Disambiguated on the wire by the presence
+/// of `text` vs `blob`.
 pub const ResourceContents = union(enum) {
     text: TextResource,
     blob: BlobResource,

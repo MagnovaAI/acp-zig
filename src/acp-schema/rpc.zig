@@ -8,6 +8,7 @@
 const std = @import("std");
 const RawValue = @import("serde_util.zig").RawValue;
 
+/// Wire-level value of the `jsonrpc` field. Always literal "2.0".
 pub const JSONRPC_VERSION: []const u8 = "2.0";
 
 /// Request id: a JSON string or integer. Null is permitted on the wire for

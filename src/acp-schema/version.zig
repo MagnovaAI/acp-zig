@@ -6,10 +6,14 @@
 
 const std = @import("std");
 
+/// On-wire protocol version. Compare with `eql`; never read `value` directly
+/// when negotiating since older peers send it as a decimal string.
 pub const ProtocolVersion = struct {
     value: u16,
 
+    /// First (and currently only) shipped protocol revision.
     pub const V1: ProtocolVersion = .{ .value = 1 };
+    /// Convenience alias for the newest revision this build understands.
     pub const LATEST: ProtocolVersion = V1;
 
     pub fn init(value: u16) ProtocolVersion {

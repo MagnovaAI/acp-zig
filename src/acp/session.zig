@@ -15,6 +15,7 @@ const std = @import("std");
 const schema = @import("acp-schema");
 const AcpError = @import("errors.zig").AcpError;
 
+/// Session lifecycle state. See module-level docs for transitions.
 pub const State = enum {
     idle,
     initialized,
@@ -22,6 +23,7 @@ pub const State = enum {
     closed,
 };
 
+/// One conversation between client and agent. Owned by a `Registry`.
 pub const Session = struct {
     id: schema.agent.SessionId,
     state: State = .idle,

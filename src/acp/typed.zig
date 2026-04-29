@@ -110,10 +110,12 @@ pub const Dispatcher = struct {
         });
     }
 
+    /// View of this dispatcher as a `RequestHandler` for `Connection.setRequestHandler`.
     pub fn requestHandler(self: *Dispatcher) RequestHandler {
         return .{ .ptr = self, .vtable = &request_vtable };
     }
 
+    /// View of this dispatcher as a `NotificationHandler` for `Connection.setNotificationHandler`.
     pub fn notificationHandler(self: *Dispatcher) NotificationHandler {
         return .{ .ptr = self, .vtable = &notification_vtable };
     }

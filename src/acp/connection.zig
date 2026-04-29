@@ -23,6 +23,8 @@ pub const Connection = struct {
     notification_handler: ?NotificationHandler = null,
     next_id: i64 = 1,
 
+    /// Borrow `transport`. The Connection does not take ownership; the
+    /// caller is responsible for closing it when the connection ends.
     pub fn init(
         allocator: std.mem.Allocator,
         transport: Transport,
@@ -30,10 +32,14 @@ pub const Connection = struct {
         return .{ .allocator = allocator, .transport = transport };
     }
 
+    /// Install the handler invoked for every inbound request. Without one,
+    /// requests are answered with method-not-found.
     pub fn setRequestHandler(self: *Connection, h: RequestHandler) void {
         self.request_handler = h;
     }
 
+    /// Install the handler invoked for every inbound notification. Without
+    /// one, notifications are silently dropped (per JSON-RPC).
     pub fn setNotificationHandler(self: *Connection, h: NotificationHandler) void {
         self.notification_handler = h;
     }

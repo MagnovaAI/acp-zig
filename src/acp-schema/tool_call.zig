@@ -8,6 +8,8 @@ const std = @import("std");
 const RawValue = @import("serde_util.zig").RawValue;
 const ContentBlock = @import("content.zig").ContentBlock;
 
+/// Opaque tool-call identifier minted by the agent. Used to correlate a
+/// `tool_call` first emission with subsequent `tool_call_update` events.
 pub const ToolCallId = struct {
     value: []const u8,
 
@@ -39,6 +41,7 @@ pub const ToolCallId = struct {
     }
 };
 
+/// Lifecycle of a tool call. Monotonic except `failed`, which terminates.
 pub const ToolCallStatus = enum {
     pending,
     in_progress,

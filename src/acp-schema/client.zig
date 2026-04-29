@@ -58,6 +58,8 @@ pub const RequestPermissionRequest = struct {
     options: []const PermissionOption,
 };
 
+/// User decision on a permission prompt. `cancelled` means the dialog was
+/// dismissed without picking an option.
 pub const RequestPermissionOutcome = union(enum) {
     selected: Selected,
     cancelled,
@@ -147,6 +149,7 @@ pub const WriteTextFileResponse = struct {};
 // terminal/*
 // ---------------------------------------------------------------------------
 
+/// Opaque terminal handle minted by the client on `terminal/create`.
 pub const TerminalId = struct {
     value: []const u8,
 

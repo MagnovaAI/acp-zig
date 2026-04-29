@@ -6,6 +6,7 @@
 const std = @import("std");
 const RawValue = @import("serde_util.zig").RawValue;
 
+/// JSON-RPC error code. Negative values in the -32xxx band are reserved.
 pub const Code = i32;
 
 pub const parse_error: Code = -32700;
@@ -19,11 +20,15 @@ pub const internal_error: Code = -32603;
 pub const auth_required: Code = -32000;
 pub const session_not_found: Code = -32001;
 
+/// Domain-level error value. Distinct from the Zig `error` set in `acp/errors.zig`
+/// because this one is JSON-shaped and crosses the wire.
 pub const Error = struct {
     code: Code,
     message: []const u8,
     data: ?RawValue = null,
 
+    /// Construct a canonical method-not-found error. `method` is currently
+    /// unused — kept in the signature for future inclusion in `data`.
     pub fn methodNotFound(method: []const u8) Error {
         _ = method;
         return .{ .code = method_not_found, .message = "Method not found" };

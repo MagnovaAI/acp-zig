@@ -40,6 +40,8 @@ pub const AgentCapabilities = struct {
     };
 };
 
+/// First request a client sends. The agent replies with the highest version
+/// it speaks plus its capability set.
 pub const InitializeRequest = struct {
     protocolVersion: ProtocolVersion,
     clientCapabilities: ?ClientCapabilities = null,
@@ -51,6 +53,8 @@ pub const InitializeResponse = struct {
     authMethods: ?[]const AuthMethod = null,
 };
 
+/// One auth method the agent offers; the client picks one and follows up
+/// with `authenticate`.
 pub const AuthMethod = struct {
     id: []const u8,
     name: []const u8,
@@ -73,6 +77,7 @@ pub const AuthenticateResponse = struct {};
 // session/*
 // ---------------------------------------------------------------------------
 
+/// Opaque session identifier minted by the agent on `session/new`.
 pub const SessionId = struct {
     value: []const u8,
 
@@ -104,6 +109,7 @@ pub const SessionId = struct {
     }
 };
 
+/// External MCP server the client wants the agent to bridge into the session.
 pub const McpServerConfig = struct {
     name: []const u8,
     command: []const u8,
@@ -148,6 +154,7 @@ pub const PromptResponse = struct {
     stopReason: StopReason,
 };
 
+/// Why the agent stopped producing tokens for this prompt.
 pub const StopReason = enum {
     end_turn,
     max_tokens,
@@ -203,6 +210,8 @@ pub const SetModeResponse = struct {};
 
 pub const method_session_update: []const u8 = "session/update";
 
+/// One streamed update emitted by the agent during a prompt. Tagged on the
+/// wire by `sessionUpdate`.
 pub const SessionUpdate = union(enum) {
     user_message_chunk: ContentChunk,
     agent_message_chunk: ContentChunk,
@@ -323,6 +332,7 @@ pub const SessionUpdate = union(enum) {
     }
 };
 
+/// `session/update` notification body: a session id plus one update event.
 pub const SessionNotification = struct {
     sessionId: SessionId,
     update: SessionUpdate,

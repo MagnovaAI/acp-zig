@@ -12,6 +12,9 @@ const Transport = acp.Transport;
 const Frame = acp.Frame;
 const AcpError = acp.AcpError;
 
+/// Two-ended in-memory pipe. Each end exposes a `Transport` that writes into
+/// the peer's read queue. Frames are owned slices duplicated on push and
+/// freed on pop. Heap-allocated so transports can hold stable pointers.
 pub const PipePair = struct {
     allocator: std.mem.Allocator,
     a_to_b: Queue,

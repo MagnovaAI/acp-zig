@@ -68,12 +68,14 @@ pub const Priority = enum {
     }
 };
 
+/// One step in an agent's plan.
 pub const PlanEntry = struct {
     content: []const u8,
     status: PlanEntryStatus,
     priority: Priority = .medium,
 };
 
+/// Agent's current plan, streamed to the client as a session update.
 pub const Plan = struct {
     entries: []const PlanEntry,
 };
