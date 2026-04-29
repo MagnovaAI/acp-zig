@@ -64,6 +64,38 @@ pub fn build(b: *std.Build) void {
         .root_module = acp_async,
     });
     test_step.dependOn(&b.addRunArtifact(acp_async_tests).step);
+
+    const cookbook_step = b.step("cookbook", "Build cookbook examples");
+
+    const minimal_client_module = b.createModule(.{
+        .root_source_file = b.path("src/acp-cookbook/minimal_client.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    minimal_client_module.addImport("acp", acp);
+    minimal_client_module.addImport("acp-test", acp_test);
+    minimal_client_module.addImport("acp-schema", schema);
+    const minimal_client_exe = b.addExecutable(.{
+        .name = "minimal-client",
+        .root_module = minimal_client_module,
+    });
+    b.installArtifact(minimal_client_exe);
+    cookbook_step.dependOn(&minimal_client_exe.step);
+
+    const minimal_agent_module = b.createModule(.{
+        .root_source_file = b.path("src/acp-cookbook/minimal_agent.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    minimal_agent_module.addImport("acp", acp);
+    minimal_agent_module.addImport("acp-test", acp_test);
+    minimal_agent_module.addImport("acp-schema", schema);
+    const minimal_agent_exe = b.addExecutable(.{
+        .name = "minimal-agent",
+        .root_module = minimal_agent_module,
+    });
+    b.installArtifact(minimal_agent_exe);
+    cookbook_step.dependOn(&minimal_agent_exe.step);
 }
 
 const UnstableFlags = struct {
