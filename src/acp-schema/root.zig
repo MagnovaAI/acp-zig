@@ -55,6 +55,14 @@ pub const ToolCallUpdate = tool_call.ToolCallUpdate;
 pub const agent = @import("agent.zig");
 pub const client = @import("client.zig");
 
+pub const routing = @import("routing.zig");
+pub const AgentRequest = routing.AgentRequest;
+pub const AgentResponse = routing.AgentResponse;
+pub const AgentNotification = routing.AgentNotification;
+pub const ClientRequest = routing.ClientRequest;
+pub const ClientResponse = routing.ClientResponse;
+pub const ClientNotification = routing.ClientNotification;
+
 pub const protocol_level = @import("protocol_level.zig");
 pub const elicitation = @import("elicitation.zig");
 pub const nes = @import("nes.zig");
