@@ -27,7 +27,6 @@ pub fn build(b: *std.Build) void {
 }
 
 const UnstableFlags = struct {
-    unstable_protocol_v2: bool,
     unstable_elicitation: bool,
     unstable_nes: bool,
     unstable_cancel_request: bool,

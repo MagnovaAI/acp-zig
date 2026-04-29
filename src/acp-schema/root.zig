@@ -1,8 +1,4 @@
 //! Public surface of the wire-format schema package.
-//!
-//! Phase 1 establishes the foundation: the protocol version newtype, the
-//! shared codec helpers, and the JSON-RPC envelope shapes. Domain types
-//! land in subsequent phases under `v1/`.
 
 const std = @import("std");
 
@@ -22,6 +18,32 @@ pub const ResponseError = rpc.ResponseError;
 pub const Notification = rpc.Notification;
 pub const JsonRpcMessage = rpc.JsonRpcMessage;
 pub const JSONRPC_VERSION = rpc.JSONRPC_VERSION;
+
+pub const @"error" = @import("error.zig");
+pub const Error = @"error".Error;
+pub const ErrorCode = @"error".Code;
+
+pub const content = @import("content.zig");
+pub const ContentBlock = content.ContentBlock;
+pub const TextContent = content.TextContent;
+pub const ImageContent = content.ImageContent;
+pub const AudioContent = content.AudioContent;
+pub const EmbeddedResource = content.EmbeddedResource;
+pub const ResourceLink = content.ResourceLink;
+pub const ResourceContents = content.ResourceContents;
+
+pub const plan = @import("plan.zig");
+pub const Plan = plan.Plan;
+pub const PlanEntry = plan.PlanEntry;
+pub const PlanEntryStatus = plan.PlanEntryStatus;
+pub const Priority = plan.Priority;
+
+pub const ext = @import("ext.zig");
+pub const ExtRequest = ext.ExtRequest;
+pub const ExtResponse = ext.ExtResponse;
+pub const ExtNotification = ext.ExtNotification;
+
+pub const protocol_level = @import("protocol_level.zig");
 
 test {
     std.testing.refAllDecls(@This());
