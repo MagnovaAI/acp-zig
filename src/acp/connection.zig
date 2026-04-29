@@ -208,7 +208,9 @@ pub const Connection = struct {
         params: std.json.Value,
     ) AcpError!void {
         const handler = self.notification_handler orelse return;
-        handler.handle(self.allocator, method, params) catch |err| {
+        var arena = std.heap.ArenaAllocator.init(self.allocator);
+        defer arena.deinit();
+        handler.handle(arena.allocator(), method, params) catch |err| {
             log.warn("notification handler failed for '{s}': {s}", .{ method, @errorName(err) });
         };
     }

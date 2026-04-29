@@ -133,6 +133,25 @@ pub fn build(b: *std.Build) void {
     const gen_schema_step = b.step("gen-schema", "Emit canonical schema catalog JSON (path arg or stdout)");
     gen_schema_step.dependOn(&gen_schema_run.step);
 
+    const yopo_module = b.createModule(.{
+        .root_source_file = b.path("src/yopo/main.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    yopo_module.addImport("acp", acp);
+    yopo_module.addImport("acp-test", acp_test);
+    yopo_module.addImport("acp-schema", schema);
+
+    const yopo_exe = b.addExecutable(.{
+        .name = "yopo",
+        .root_module = yopo_module,
+    });
+    b.installArtifact(yopo_exe);
+
+    const yopo_run = b.addRunArtifact(yopo_exe);
+    const yopo_step = b.step("yopo", "Run the reference agent contract suite");
+    yopo_step.dependOn(&yopo_run.step);
+
     if (vaxis_dep) |dep| {
         const vaxis_module = dep.module("vaxis");
 
