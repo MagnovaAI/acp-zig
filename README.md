@@ -1,7 +1,6 @@
 # Agent Client Protocol — Zig
 
 [![Zig 0.16.0](https://img.shields.io/badge/zig-0.16.0-f7a41d?logo=zig&logoColor=white)](https://ziglang.org/download/)
-[![Tests](https://img.shields.io/badge/tests-119_pass_%2B_11_gated-success)](#testing)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 The **Agent Client Protocol** (ACP) standardises communication between *code editors* — interactive programs for viewing and editing source code — and *coding agents* — programs that use generative AI to autonomously modify code.
