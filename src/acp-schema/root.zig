@@ -53,6 +53,8 @@ pub const ToolCallLocation = tool_call.ToolCallLocation;
 pub const ToolCallUpdate = tool_call.ToolCallUpdate;
 
 pub const protocol_level = @import("protocol_level.zig");
+pub const elicitation = @import("elicitation.zig");
+pub const nes = @import("nes.zig");
 
 test {
     std.testing.refAllDecls(@This());
