@@ -15,6 +15,13 @@ pub const Framer = frame.Framer;
 pub const buffer_transport = @import("buffer_transport.zig");
 pub const BufferPair = buffer_transport.BufferPair;
 
+pub const file_transport = @import("file_transport.zig");
+pub const FileTransport = file_transport.FileTransport;
+
+pub const child_mod = @import("child.zig");
+pub const Child = child_mod.Child;
+pub const SpawnOptions = child_mod.SpawnOptions;
+
 test {
     std.testing.refAllDecls(@This());
 }
